@@ -1,161 +1,99 @@
-# Actividad: proyecto integrador de AgentCore
+# Actividad: proyecto integrador desplegado en AWS
 
 ## Propósito
 
-Diseñar un paquete de arquitectura y operación para el asistente de políticas
-de viajes, integrando los componentes del curso y demostrando que la solución
-puede validarse, observarse, actualizarse y limpiarse de forma controlada.
+Consolidar los recursos reales de los capítulos anteriores en una pequeña
+aplicación funcional desplegada totalmente en AWS. El resultado debe poder
+invocarse, usar una herramienta, recuperar memoria, respetar políticas,
+producir señales y evaluarse con tráfico sintético.
 
-## Caso de aplicación
+El objetivo no es construir un servicio productivo de alta disponibilidad:
+es demostrar una ruta completa y de bajo consumo en una cuenta personal.
 
-Construye sobre el caso anterior:
+## Prerrequisitos
 
-- backend Python con LangGraph;
-- ejecución en AgentCore Runtime;
-- inferencia mediante Amazon Bedrock;
-- herramientas remotas mediante Gateway y MCP;
-- memoria conversacional y persistente;
-- identidad del cliente e identidad outbound;
-- políticas que permiten consultas y bloquean modificaciones;
-- observabilidad y evaluaciones.
-
-El entregable es un diseño ejecutable como runbook. Puede usar datos,
-respuestas y métricas sintéticas. No requiere desplegar recursos reales ni
-incluir credenciales.
+- Actividades 1 a 5 completadas o sus recursos recreados.
+- Una sola región y un único entorno `learning`.
+- Presupuesto revisado y alertas activas.
+- Runtime, Gateway, Memory, roles, políticas y observabilidad inventariados.
+- Modelo de Bedrock habilitado y acceso probado.
 
 ## Entregable
 
-Crea un documento Markdown llamado
-`proyecto-integrador-agentcore.md` dentro de
-`course/entregas/capitulo-6/`.
+Actualiza `proyecto-integrador-agentcore.md` en
+`course/entregas/capitulo-6/`. Incluye:
 
-Debe incluir:
+1. Diagrama de la aplicación desplegada y sus identificadores reales.
+2. URL, endpoint o método de invocación y ejemplo sin secretos.
+3. Flujo exitoso y flujos de error.
+4. Evidencia de herramienta, memoria, autorización y evaluación.
+5. Métricas de una prueba pequeña y coste observado.
+6. Versionamiento y rollback.
+7. Runbook completo de apagado y eliminación.
 
-1. Arquitectura de referencia con diagrama.
-2. Flujo de una solicitud exitosa y flujos de error.
-3. Tabla de componentes, responsabilidades y contratos.
-4. Integración de LangGraph, Gateway, MCP y Memory.
-5. Matriz de identidades y políticas.
-6. Diseño de observabilidad y evaluación.
-7. Plan de versionamiento, promoción y rollback.
-8. Estrategia de errores, reintentos, latencia y concurrencia.
-9. Análisis de consumo y costes con supuestos explícitos.
-10. Runbook de limpieza de recursos de prueba.
-11. Checklist final de puesta en producción.
+## Construcción final
 
-## Pasos
+1. Revisa todos los recursos y elimina duplicados antes de integrar.
+2. Usa el Runtime del capítulo 2 y la herramienta de Gateway del capítulo 3.
+3. Conecta Memory del capítulo 4 con Actor ID y Session ID sintéticos.
+4. Aplica la política del capítulo 5 y conserva solo logs y métricas mínimas.
+5. Ejecuta una invocación válida que recupere memoria y use una herramienta.
+6. Ejecuta una invocación denegada y una con dependencia indisponible.
+7. Ejecuta la evaluación bajo demanda aprobada; no uses un conjunto grande.
+8. Publica una segunda versión, compara una muestra pequeña y demuestra
+   rollback o documenta evidencia de que el endpoint vuelve a la anterior.
+9. Mide latencia y coste con pocas invocaciones; no realices pruebas de carga.
+10. Captura inventario final con región, tags, IDs, propietarios y estado.
 
-1. Define la frontera del sistema y separa cliente, backend Python, Runtime,
-   Bedrock, Memory, Gateway, targets, identidades y señales.
-2. Dibuja el flujo de una solicitud desde autenticación hasta respuesta,
-   indicando dónde se aplican políticas y dónde se registran spans.
-3. Relaciona cada componente con una responsabilidad, una entrada, una salida,
-   un propietario y un comportamiento ante fallo.
-4. Integra conceptualmente LangGraph: entrada, recuperación de memoria,
-   decisión de herramienta, resultado remoto y respuesta.
-5. Selecciona las herramientas del capítulo 3 y limita el catálogo a las
-   operaciones necesarias.
-6. Aplica la política de memoria del capítulo 4: Actor ID, Session ID,
-   namespaces, retención y aislamiento.
-7. Aplica el paquete de control del capítulo 5: identidad inbound/outbound,
-   políticas, logs, métricas, trazas y evaluaciones.
-8. Define una versión inicial, un cambio compatible y un cambio incompatible.
-   Documenta promoción, comparación y rollback.
-9. Clasifica fallos y decide cuándo reintentar, degradar, denegar, alertar o
-   detener la solicitud.
-10. Estima consumo por invocación y por volumen mensual, indicando qué valores
-    son supuestos y qué debe medirse.
-11. Escribe el procedimiento de limpieza y verifica que no elimine recursos
-    compartidos o productivos.
-12. Completa el checklist final y marca cada evidencia como pendiente,
-    simulada o validada.
+## Límites de consumo
 
-## Tabla mínima de integración
+- Una región, un entorno y una imagen activa.
+- Sin NAT Gateway, EC2, RDS, OpenSearch ni almacenamiento persistente no
+  necesario.
+- Sin tráfico continuo, bucles de invocación o pruebas de concurrencia masiva.
+- Evaluaciones online deshabilitadas o limitadas a una muestra mínima.
+- Logs y trazas con retención corta.
+- Herramientas sintéticas y operaciones de solo lectura.
 
-Incluye una tabla con columnas equivalentes a:
-
-| Componente | Responsabilidad | Entrada | Salida | Identidad | Observabilidad | Fallo |
-|---|---|---|---|---|---|---|
-| Runtime | Ejecutar agente | Payload validado | Respuesta | Workload | Traza y latencia | Timeout |
-| Bedrock | Inferencia | Contexto permitido | Resultado del modelo | Outbound | Tokens y duración | Error de servicio |
-| Gateway | Herramientas | Nombre y argumentos | Resultado normalizado | Outbound | Target y error | Rechazo o timeout |
-| Memory | Contexto persistente | Eventos o consulta | Recuerdos | Actor/sesión | Lectura y escritura | Degradación definida |
-
-Añade LangGraph, Identity, Policy, Evaluations y el backend Python.
-
-## Matriz mínima de escenarios
-
-Incluye al menos estos escenarios:
-
-| Escenario | Comportamiento esperado |
-|---|---|
-| Consulta válida con memoria | Respuesta con contexto del actor correcto |
-| Herramienta remota exitosa | Resultado validado e incorporado al grafo |
-| Herramienta no autorizada | Denegación observable sin reintento |
-| Memory indisponible | Degradación documentada o bloqueo según riesgo |
-| Modelo lento | Timeout clasificado y respuesta no engañosa |
-| Dos sesiones concurrentes | Estado y memoria aislados |
-| Nueva versión compatible | Promoción tras pruebas y evaluación |
-| Nueva versión incompatible | Migración, nueva ruta o bloqueo |
-| Error transitorio | Reintento limitado si es idempotente |
-| Coste por encima del umbral | Alerta y revisión de configuración |
-
-## Análisis mínimo de costes y capacidad
-
-Documenta una fórmula o tabla que incluya:
-
-- invocaciones por periodo;
-- tokens o consumo de inferencia estimado;
-- llamadas promedio a herramientas;
-- lecturas y escrituras de Memory;
-- volumen de logs, métricas y trazas;
-- frecuencia de evaluaciones online y bajo demanda;
-- concurrencia normal y pico;
-- supuestos de latencia y timeout;
-- alertas o umbrales de presupuesto.
-
-No inventes precios actuales como hechos. Si usas valores de ejemplo,
-identifícalos como supuestos y deja la fuente o verificación pendiente.
+Si una capacidad requiere un recurso de pago no previsto, detén la actividad,
+consulta el coste actual en AWS y decide si sustituirla por una simulación.
 
 ## Criterios de aceptación
 
-- El diagrama integra backend Python, Runtime, Gateway, Memory, Identity,
-  Policy, Amazon Bedrock, LangGraph y observabilidad.
-- Se muestran herramientas remotas mediante Gateway y MCP.
-- El flujo diferencia identidad del cliente, identidad del agente y
-  credenciales outbound.
-- La memoria se recupera y persiste con aislamiento por actor y sesión.
-- Las políticas permiten operaciones necesarias y bloquean acciones sensibles.
-- Existen logs, métricas, trazas y evaluaciones con datos minimizados.
-- Runtime, Gateway, Memory, inferencia y herramientas tienen errores
-  clasificados.
-- Se definen timeouts, reintentos, idempotencia, degradación y concurrencia.
-- El versionamiento incluye promoción y rollback.
-- El análisis de costes separa hechos, supuestos y mediciones pendientes.
-- El runbook de limpieza tiene alcance seguro y verificación posterior.
-- Cada punto del checklist tiene evidencia pendiente, simulada o validada.
-- El documento no contiene secretos, credenciales ni instrucciones destructivas
-  sin alcance explícito.
+- La aplicación responde desde AWS y combina Python/LangGraph, Runtime,
+  Bedrock, Gateway, Memory, Identity, Policy y observabilidad.
+- Una invocación usa una herramienta real y recupera memoria real.
+- Existe evidencia de autorización permitida y denegada.
+- Se ejecuta una evaluación versionada.
+- Se prueban error, timeout o degradación sin éxito falso.
+- Se documenta rollback y no se dejan versiones duplicadas activas.
+- Coste, región, tags y recursos están inventariados.
+- El runbook permite apagar y eliminar todo el laboratorio de forma segura.
+
+## Limpieza final obligatoria
+
+Realiza la limpieza en este orden y registra cada confirmación:
+
+1. Detén el tráfico y deshabilita endpoints, evaluaciones online y alarmas.
+2. Elimina targets, Gateway y endpoints HTTP de prueba.
+3. Elimina el Runtime y sus versiones no necesarias.
+4. Elimina Memory y sus eventos sintéticos.
+5. Elimina Lambda, ECR, imágenes, logs, dashboards y alarmas.
+6. Retira roles y políticas creados exclusivamente para el laboratorio.
+7. Elimina la alerta de presupuesto solo cuando ya no haya recursos activos;
+   conserva MFA y la identidad administrativa.
+8. Revisa Billing, Cost Explorer y la consola de cada servicio después de
+   esperar la actualización de cargos.
+9. Conserva el runbook y la evidencia, pero elimina secretos y datos de
+   ejecución del repositorio.
+
+Para cada servicio usa el identificador exacto documentado. No uses
+comodines, borrado recursivo ni comandos que puedan afectar otros proyectos.
+Si no puedes confirmar el alcance de una eliminación, detente y verifica en la
+consola.
 
 ## Resultado esperado
 
-El resultado es un paquete final que permite a otra persona entender cómo
-construir, validar y operar el asistente sin depender de conocimiento tácito.
-Debe ser suficientemente concreto para guiar una implementación de prueba y
-conservar límites claros para que la promoción a producción requiera
-aprobaciones y evidencias reales.
-
-## Preguntas abiertas y límites
-
-- ¿Qué requisitos de disponibilidad y recuperación aplican al caso real?
-- ¿Qué modelo, región y límites de servicio deben verificarse?
-- ¿Qué operaciones requieren aprobación humana?
-- ¿Qué políticas de retención y eliminación aplican a Memory y logs?
-- ¿Qué volumen de tráfico y concurrencia debe soportar el primer release?
-- ¿Qué métricas determinan que una versión puede promoverse?
-- ¿Quién puede ejecutar rollback y limpieza?
-- ¿Qué evidencias faltan para considerar la arquitectura lista para producción?
-
-Queda fuera de esta actividad crear recursos reales sin autorización, registrar
-credenciales, fijar precios sin fuente actualizada y declarar cumplimiento
-productivo o legal sin revisión de los responsables correspondientes.
+Una pequeña aplicación de agente funcional, desplegada completamente en AWS,
+demostrable con datos sintéticos y acompañada de un inventario y runbook que
+evitan gastos posteriores innecesarios.

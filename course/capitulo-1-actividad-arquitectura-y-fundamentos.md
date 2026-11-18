@@ -1,97 +1,98 @@
-# Actividad: mapa arquitectónico de AgentCore
+# Actividad: preparar una cuenta AWS personal para AgentCore
 
 ## Propósito
 
-Aplicar los conceptos del capítulo para analizar una solución de agente,
-separar responsabilidades y detectar decisiones de seguridad y operación
-antes de implementar.
+Preparar una cuenta personal de AWS con controles de coste, una región de
+estudio, acceso al modelo y una identidad de trabajo con mínimo privilegio.
+Al terminar, quedará documentada la arquitectura objetivo y el inventario que
+se utilizará en los capítulos siguientes.
+
+Esta es una actividad sobre recursos reales. No utilices una cuenta
+productiva, datos reales ni credenciales de larga duración.
 
 ## Caso de aplicación
 
-Una empresa quiere construir un asistente interno para consultar políticas de
-viajes. El asistente tendrá una aplicación Python con LangGraph, consultará
-una API interna de políticas y podrá conservar preferencias conversacionales
-del usuario. La solución debe ejecutarse en AWS, usar un modelo de Amazon
-Bedrock y permitir que el equipo de operaciones diagnostique errores y latencia.
-
-El caso es hipotético y no presupone que la API, las credenciales o los
-recursos de AWS ya existan.
+Continúa el caso del asistente de políticas de viajes. La solución final
+usará Python, LangGraph, AgentCore Runtime, Gateway, Memory, Identity, Policy,
+Amazon Bedrock y observabilidad. En este capítulo todavía no se despliega el
+agente; se prepara la cuenta y se validan las precondiciones.
 
 ## Entregable
 
-Crea un documento Markdown llamado
-`mapa-arquitectonico-agentcore.md` dentro de
-`course/entregas/capitulo-1/`.
+Crea `mapa-arquitectonico-agentcore.md` dentro de
+`course/entregas/capitulo-1/`. Incluye:
 
-El documento debe contener:
+1. Diagrama de la arquitectura final y sus componentes.
+2. Región, cuenta y perfil AWS de estudio.
+3. Convención de nombres y etiquetas, por ejemplo
+   `Project=agentcore-study`, `Environment=learning` y `Owner=<alias>`.
+4. Inventario de recursos, responsables y comandos o pantallas usados.
+5. Resultado de la validación de acceso al modelo.
+6. Identidades de administración y ejecución.
+7. Riesgos, límites y decisiones pendientes.
 
-1. Un diagrama textual o Mermaid de la solución.
-2. Una tabla que relacione cada necesidad con un componente de AgentCore.
-3. Un apartado de identidades, permisos y separación entre plano de control y
-   plano de ejecución.
-4. Una lista de supuestos, riesgos y decisiones pendientes.
-5. Una lista de verificaciones para preparar el entorno.
+## Preparación segura de la cuenta
+
+1. Activa MFA para la cuenta raíz y no uses la cuenta raíz para laboratorios.
+2. Elige una sola región compatible con los servicios del curso y registra la
+   decisión. No repartas recursos entre regiones.
+3. Usa un perfil o identidad administrativa de estudio con MFA. No guardes
+   access keys en el repositorio ni en la imagen del agente.
+4. Configura una alerta de presupuesto de AWS con un umbral bajo apropiado
+   para tu cuenta. Registra destinatario, umbral y fecha de revisión.
+5. Habilita solo el acceso al modelo de Bedrock que el laboratorio necesita,
+   siguiendo la consola o documentación vigente de AWS.
+6. Comprueba cuotas, disponibilidad regional y requisitos de AgentCore antes
+   de crear recursos.
+7. Crea una identidad o rol de ejecución separado. Concede únicamente lo
+   necesario para invocar el modelo y los recursos que se crearán después.
+8. Documenta cada cambio en un inventario; no guardes secretos ni valores de
+   tokens.
 
 ## Pasos
 
 1. Describe en cinco líneas o menos qué hará el asistente y qué parte
    corresponde a LangGraph.
-2. Dibuja el flujo desde la solicitud del usuario hasta la respuesta,
-   incluyendo el modelo, la herramienta de políticas y la memoria.
-3. Asigna responsabilidades a Runtime, Gateway, Memory, Identity, Policy,
-   Observability y Evaluations.
-4. Decide si Browser y Code Interpreter son necesarios para este caso. Justifica
-   la decisión; no los habilites solo porque están disponibles.
-5. Separa las operaciones de administración de recursos de las operaciones de
-   ejecución del agente.
-6. Propón dos identidades: una para administrar o preparar recursos y otra para
-   ejecutar el agente. Indica qué tipo de acciones necesitaría cada una, sin
-   inventar nombres concretos de permisos si no puedes verificarlos.
-7. Define al menos tres señales de observabilidad: una métrica, un evento de
-   log y una traza o span.
-8. Propón dos criterios de evaluación del agente, por ejemplo exactitud de la
-   respuesta y uso correcto de la herramienta.
-9. Lista los datos que deben confirmarse antes de comenzar: región, acceso al
-   modelo, configuración del SDK, configuración de la CLI y credenciales.
-10. Identifica al menos un supuesto y un límite que deban validarse con el
-    equipo responsable de la API interna.
+2. Dibuja el flujo desde el usuario hasta Runtime, Bedrock, Gateway, Memory y
+   observabilidad.
+3. Distingue plano de control y plano de ejecución.
+4. Explica por qué Browser y Code Interpreter quedan deshabilitados en este
+   laboratorio.
+5. Valida desde la CLI o consola la región, identidad activa y acceso al
+   modelo. Guarda solo la salida no sensible.
+6. Crea y prueba la alerta de presupuesto. No la confundas con un límite duro:
+   supervisa el coste diariamente.
+7. Define el rol de ejecución y deja pendientes los permisos específicos de
+   Runtime, Gateway y Memory para los capítulos en que se necesiten.
+8. Ejecuta una revisión de “qué se creó” y registra recursos, región, tags y
+   propietario.
 
 ## Criterios de aceptación
 
-- El documento explica el papel de los siete componentes principales del
-  capítulo: Runtime, Gateway, Memory, Identity, Policy, Observability y
-  Evaluations.
-- El flujo distingue la lógica de LangGraph de las capacidades administradas
-  de AgentCore.
-- El diagrama muestra como mínimo usuario, aplicación Python, Runtime,
-  modelo, Gateway, herramienta de políticas y Memory.
-- La tabla diferencia explícitamente plano de control y plano de ejecución.
-- Se proponen identidades separadas para administración y ejecución.
-- Se mencionan mínimo privilegio, región, credenciales y acceso al modelo.
-- La propuesta incluye una métrica, un log, una traza o span y dos criterios de
-  evaluación.
-- Browser y Code Interpreter tienen una decisión justificada.
-- Cada riesgo o decisión pendiente tiene una explicación breve.
-- El entregable es Markdown, se puede leer sin archivos adicionales y no
-  contiene secretos, claves ni credenciales reales.
+- La arquitectura incluye usuario, Python/LangGraph, Runtime, Bedrock,
+  Gateway, Memory y observabilidad.
+- La cuenta tiene MFA, región única y una alerta de presupuesto configurada.
+- El acceso al modelo requerido está validado.
+- Administración y ejecución usan identidades separadas.
+- Los recursos y documentos usan una convención de tags.
+- El inventario no contiene secretos.
+- Browser y Code Interpreter no se habilitan sin necesidad.
+- Se documenta un procedimiento para revisar coste y recursos cada sesión.
+
+## Limpieza y control de gastos
+
+Al finalizar:
+
+1. Revisa el inventario y confirma que no se creó ningún recurso inesperado.
+2. Mantén la alerta de presupuesto si continuarás el curso; elimínala al
+   terminar todo el laboratorio desde AWS Billing > Budgets.
+3. Si creaste un rol o política exclusivamente para esta actividad, elimina
+   primero sus asociaciones y después el rol/política desde IAM.
+4. Revoca sesiones o credenciales temporales que no vuelvas a usar.
+5. No elimines la identidad administrativa principal ni desactives MFA.
 
 ## Resultado esperado
 
-El resultado es un mapa inicial que permite explicar la arquitectura a otro
-miembro del equipo y detectar qué debe definirse antes de desplegar. No se
-espera todavía un agente funcional ni una configuración completa de AWS.
-
-## Preguntas abiertas y límites
-
-- ¿La API interna requiere autenticación del usuario, del agente o de ambos?
-- ¿Qué información puede conservarse en Memory y durante cuánto tiempo?
-- ¿Qué operaciones de la API son de solo lectura y cuáles podrían modificar
-  datos?
-- ¿Qué latencia máxima acepta el usuario para una respuesta?
-- ¿Qué datos deben excluirse de logs y trazas?
-- ¿Qué conjunto de interacciones se utilizará para evaluar el agente?
-
-Queda fuera de esta actividad crear recursos reales, desplegar contenedores,
-configurar un endpoint productivo, implementar la API interna y seleccionar
-políticas concretas de producción. Esas tareas se abordarán cuando el plan
-prepare sus respectivos conceptos.
+Una cuenta personal preparada y controlada, con acceso mínimo al modelo,
+alerta de coste e inventario suficiente para crear el primer Runtime sin
+confundir recursos de estudio con recursos productivos.

@@ -1,135 +1,92 @@
-# Actividad: catálogo seguro de herramientas con Gateway
+# Actividad: crear herramientas reales con AgentCore Gateway
 
 ## Propósito
 
-Diseñar un catálogo de herramientas para el asistente de políticas de viajes,
-definir sus contratos y preparar su consumo desde Python y LangGraph mediante
-AgentCore Gateway. El ejercicio aplica descubrimiento, targets, autenticación,
-autorización, errores, dominios y versionamiento sin exigir un despliegue
-productivo.
+Crear herramientas de estudio en AWS y conectarlas al Runtime del capítulo 2
+mediante AgentCore Gateway. La actividad cubre un target Lambda, un endpoint
+HTTP sencillo y un servidor MCP de prueba, usando datos sintéticos y
+operaciones de solo lectura.
 
-## Caso de aplicación
+## Prerrequisitos
 
-Continúa el caso de los capítulos anteriores. El asistente interno necesita:
-
-1. Consultar una política de viajes por país o región.
-2. Buscar el estado de una solicitud de viaje.
-3. Proponer un cálculo de viáticos sin modificar registros.
-
-La primera capacidad está disponible como API REST, la segunda como función
-Lambda y la tercera como servidor MCP existente. Las implementaciones son
-hipotéticas: documenta contratos y decisiones sin inventar URLs, nombres de
-cuentas, secretos ni permisos concretos no verificados.
+- Runtime del capítulo 2 activo o recreable.
+- Región y perfil de estudio únicos.
+- Presupuesto, tags e inventario actualizados.
+- Permisos mínimos para Lambda, API Gateway/endpoint HTTP, ECR si aplica y
+  AgentCore Gateway.
 
 ## Entregable
 
-Crea un documento Markdown llamado
-`catalogo-herramientas-gateway.md` dentro de
-`course/entregas/capitulo-3/`.
+Actualiza `catalogo-herramientas-gateway.md` en
+`course/entregas/capitulo-3/`. Añade:
 
-Debe incluir:
+1. Recursos reales creados, región, tags e identificadores.
+2. Diagrama agente -> Gateway -> target -> backend.
+3. Catálogo con contratos de entrada y salida.
+4. Evidencia de descubrimiento e invocación de cada herramienta.
+5. Identidades, autenticación, autorización y errores.
+6. Versiones y pruebas de incompatibilidad.
+7. Inventario de recursos y pasos de eliminación.
 
-1. Un diagrama del recorrido agente -> Gateway -> target -> backend.
-2. Un catálogo con las tres herramientas del caso.
-3. Esquemas de entrada y salida para cada herramienta.
-4. Target y backend correspondiente.
-5. Identidad, autenticación y autorización por dominio.
-6. Matriz de errores, reintentos e idempotencia.
-7. Adaptación conceptual para consumo desde Python y LangGraph.
-8. Estrategia de versionamiento y retirada.
-9. Decisión sobre qué herramientas quedan disponibles para este agente.
-10. Supuestos, límites y preguntas pendientes.
+## Recursos de bajo consumo
+
+Implementa solo:
+
+- una función Lambda pequeña que devuelva datos sintéticos;
+- un endpoint HTTP de prueba con una respuesta fija, si la integración
+  requerida por Gateway lo necesita;
+- un servidor MCP local o mínimo, expuesto únicamente durante la prueba y sin
+  datos reales.
+
+No uses NAT Gateway, EC2, RDS, OpenSearch ni cargas continuas. Si una
+integración exige un servicio no gratuito o persistente, detente, estima el
+coste y confirma que es imprescindible antes de crearlo.
 
 ## Pasos
 
-1. Define nombres y descripciones que permitan descubrir cada herramienta sin
-   ambigüedad.
-2. Especifica campos obligatorios, tipos, unidades y restricciones de entrada.
-3. Define una respuesta exitosa y errores distinguibles para cada operación.
-4. Explica cómo se transforma cada backend en un target de Gateway:
-   API REST, Lambda y servidor MCP.
-5. Distingue la identidad que invoca Gateway de la identidad que usa cada
-   target para acceder al backend.
-6. Asigna cada herramienta a un dominio funcional y limita el catálogo del
-   asistente a las operaciones estrictamente necesarias.
-7. Describe cómo el cliente Python descubre o configura las herramientas,
-   valida argumentos, invoca y normaliza resultados.
-8. Explica cómo un nodo de LangGraph recibiría el resultado o error sin
-   incorporar URL, secretos ni detalles del backend.
-9. Define qué fallos se reintentan y cuáles se devuelven inmediatamente.
-10. Propón una versión inicial y un cambio incompatible; documenta cómo se
-    publicarían, probarían y retirarían.
-
-## Estructura mínima del catálogo
-
-Usa una tabla con columnas equivalentes a:
-
-| Campo | Qué debe describir |
-|---|---|
-| Herramienta | Nombre estable y propósito |
-| Dominio | Área funcional responsable |
-| Target | Tipo de integración y destino lógico |
-| Entrada | Campos, tipos y restricciones |
-| Salida | Datos devueltos y formato |
-| Efecto | Solo lectura o efecto secundario |
-| Identidad | Quién invoca y quién accede al backend |
-| Errores | Validación, autorización, transitorio y backend |
-| Versión | Versión publicada y compatibilidad |
-
-## Matriz mínima de pruebas
-
-Incluye al menos estos casos:
-
-| Caso | Resultado esperado |
-|---|---|
-| Descubrimiento del catálogo | Solo aparecen herramientas permitidas |
-| Argumento obligatorio ausente | La llamada se rechaza antes del backend |
-| Tipo o unidad inválida | Se devuelve error de validación claro |
-| Identidad sin permiso | La operación se rechaza sin reintento |
-| API REST lenta | Se aplica timeout y solo se reintenta si corresponde |
-| Lambda con error transitorio | Se clasifica y limita el reintento |
-| Servidor MCP incompatible | Se detecta incompatibilidad, no se oculta |
-| Resultado vacío | El agente distingue ausencia de datos de error |
-| Herramienta con efecto | Se identifica el riesgo y la autorización adicional |
-| Versión incompatible | Se mantiene la versión anterior o se bloquea promoción |
+1. Reutiliza el agente y Runtime del capítulo 2.
+2. Crea una Lambda de solo lectura para consultar una política sintética.
+   Limita memoria, timeout y concurrencia; registra su ARN.
+3. Crea el endpoint HTTP mínimo solo si el target REST lo requiere. Usa una
+   respuesta fija y desactívalo al finalizar.
+4. Levanta un servidor MCP de prueba con una herramienta de cálculo local,
+   sin secretos ni efectos secundarios.
+5. Configura un target de Gateway para cada backend usando la CLI/consola
+   vigente. Documenta autenticación y permisos reales.
+6. Publica únicamente las herramientas necesarias para el agente.
+7. Descubre el catálogo desde Python, valida argumentos e invoca cada target.
+8. Integra los resultados en el nodo de herramientas de LangGraph.
+9. Prueba validación, autorización, timeout, resultado vacío y versión
+   incompatible.
+10. Registra latencia y coste aproximado de cada llamada sin guardar payloads
+    sensibles.
 
 ## Criterios de aceptación
 
-- El catálogo cubre las tres herramientas y sus tres tipos de backend.
-- Cada herramienta tiene propósito, dominio, entrada, salida y efecto
-  explícitos.
-- El diagrama muestra Gateway, targets y backends.
-- Se distinguen autenticación y autorización.
-- Se separan las identidades de invocación y de acceso al backend.
-- El catálogo limita herramientas por dominio y mínimo privilegio.
-- Se explican descubrimiento e invocación desde Python.
-- Se describe la conversión de resultados y errores para LangGraph.
-- La matriz contempla validación, autorización, timeout, reintentos,
-  incompatibilidad y versionamiento.
-- Se documenta al menos un cambio compatible y uno incompatible.
-- No se incluyen credenciales, URLs reales ni permisos no verificados como si
-  fueran definitivos.
-- El documento identifica qué decisiones requieren validación con los dueños de
-  cada backend.
+- Gateway real descubre los targets configurados.
+- La Lambda se invoca desde el agente y devuelve el contrato esperado.
+- El endpoint HTTP y MCP, si fueron creados, responden y están documentados.
+- El agente no conoce secretos ni URLs internas del backend.
+- Se bloquea cualquier operación de escritura.
+- Los errores se clasifican y los reintentos están limitados.
+- Se demuestra al menos una invocación desde Python y una desde LangGraph.
+- Se documentan identificadores, tags, región y coste observado.
+
+## Limpieza obligatoria
+
+1. Detén el servidor MCP y elimina su endpoint público o regla temporal.
+2. Elimina los targets y el Gateway desde la consola o comando específico de
+   AgentCore; elimina solo los identificadores registrados.
+3. Elimina la Lambda con el comando equivalente a
+   `aws lambda delete-function --function-name <nombre> --region <región>`.
+4. Elimina el endpoint HTTP y sus stages o integraciones.
+5. Retira roles y políticas exclusivos de las herramientas.
+6. Verifica que el Runtime ya no tenga herramientas activas y revisa costes.
+
+No borres el Runtime si el capítulo 4 lo reutilizará; registra explícitamente
+qué queda activo y durante cuánto tiempo.
 
 ## Resultado esperado
 
-El resultado es un catálogo revisable por los equipos de aplicación,
-seguridad y backend. Debe permitir responder qué puede hacer cada herramienta,
-quién puede invocarla, qué sistema la implementa, cómo falla y cómo cambiará
-sin romper agentes existentes.
-
-## Preguntas abiertas y límites
-
-- ¿Qué identidad debe propagarse desde el usuario al backend?
-- ¿Qué datos de la API de políticas pueden enviarse al modelo?
-- ¿Qué operación del servidor MCP tiene efectos secundarios, si existe alguna?
-- ¿Qué herramientas deben requerir aprobación adicional?
-- ¿Qué latencia máxima tolera el agente antes de elegir una respuesta
-  alternativa?
-- ¿Qué versión mínima de cada backend debe soportarse?
-
-Queda fuera de esta actividad desplegar Gateway, crear la función Lambda,
-implementar el servidor MCP, configurar secretos reales y construir políticas
-productivas. La actividad produce diseño y criterios de validación, no una
-integración autorizada en una cuenta real.
+El agente del capítulo 2 utiliza al menos una herramienta real a través de
+Gateway, con contratos, permisos mínimos, pruebas y limpieza verificable.
