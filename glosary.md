@@ -385,6 +385,183 @@ adicionales no deseados.
 Separación que impide que el estado, memoria, credenciales o resultados de un
 usuario, sesión o entorno se mezclen con los de otro.
 
+### Identidad humana
+
+Identidad de una persona que se autentica con contraseña, MFA o un proveedor
+de identidad corporativo. Puede aportar factores de autenticación que una
+carga de trabajo no tiene.
+
+### Identidad de carga de trabajo
+
+Identidad de un proceso, contenedor, función o agente que no tiene contraseña
+ni MFA. Se autentica asumiendo un rol y recibe credenciales temporales del
+entorno en el que se ejecuta.
+
+### Credenciales de larga duración
+
+Credenciales cuyo identificador y secreto no caducan y solo dejan de servir
+cuando se revocan, como las access keys de un usuario de IAM. Al no estar
+ligadas a un factor humano, una filtración conserva acceso hasta que se
+detecta y se responde.
+
+### Credenciales temporales
+
+Credenciales formadas por identificador, secreto y token de sesión, con
+caducidad explícita y duración máxima. Se obtienen al demostrar identidad y
+caducan solas, de modo que el material en reposo es siempre de vida corta.
+
+### Token de sesión
+
+Elemento adicional de una credencial temporal que la vincula a una sesión
+concreta y a su caducidad. Su presencia distingue una credencial temporal de
+un par identificador/secreto permanente.
+
+### Sesión
+
+Intervalo durante el cual unas credenciales temporales concretas son válidas.
+Incluye el inicio por autenticación, la renovación sin nuevo login, la
+caducidad y el cierre o la revocación.
+
+### Caducidad
+
+Momento a partir del cual una credencial o sesión deja de ser aceptada. Limita
+el daño de una filtración y explica la mayoría de fallos de autenticación
+aparentemente repentinos.
+
+### Revocación
+
+Anulación explícita de una credencial, sesión o permiso antes de su caducidad.
+Requiere poder identificar qué sesiones o claves existen; con credenciales de
+larga duración es la única respuesta posible ante una filtración.
+
+### Access key
+
+Par de identificador y secreto de larga duración asociado a un usuario de IAM
+o a la cuenta raíz. AWS no la recomienda para accesos humanos y la prohíbe
+para la cuenta raíz.
+
+### Usuario de IAM
+
+Identidad de una cuenta de AWS con credenciales propias, opcionalmente con
+acceso a la consola y MFA. Sirve para accesos humanos acotados, pero no escala
+a varias cuentas ni a un directorio corporativo.
+
+### Grupo de IAM
+
+Conjunto de usuarios de IAM que comparten políticas. Asignar permisos al grupo
+y no a cada usuario permite separar niveles de administración y de ejecución.
+
+### Cuenta raíz
+
+Identidad propietaria de la cuenta de AWS, con permisos totales no
+restringibles. Se usa solo para tareas de cuenta, siempre con MFA y sin
+credenciales programáticas.
+
+### Principal
+
+Sujeto que realiza una petición a AWS, como un usuario, un rol, un servicio o
+una identidad federada. Las políticas de confianza y de recursos se escriben
+en términos de principals.
+
+### Rol de IAM
+
+Identidad asumible que no tiene credenciales permanentes. Al asumirse entrega
+credenciales temporales con los permisos del rol, y su política de confianza
+define quién puede asumirlo.
+
+### Política de confianza
+
+Documento que define qué principals pueden asumir un rol y bajo qué
+condiciones. Es la frontera real de seguridad del rol, con independencia de
+los permisos que ese rol tenga.
+
+### AWS STS
+
+Servicio que emite credenciales temporales y evalúa las solicitudes de
+asunción de roles. Es la pieza común a los roles, a las credenciales de carga
+de trabajo y a la federación.
+
+### MFA
+
+Segundo factor que demuestra posesión de un dispositivo además de la
+contraseña. Solo protege las operaciones que lo exigen: una access key creada
+para un usuario con MFA no aplica ese factor al usarse.
+
+### Federación de identidades
+
+Confianza entre AWS y un proveedor de identidad externo, mediante SAML u
+OIDC, para que sus usuarios asuman roles sin duplicar usuarios de IAM.
+
+### Proveedor de identidad (IdP)
+
+Sistema externo que autentica a las personas de una organización y emite
+aserciones o tokens en los que AWS puede confiar.
+
+### IAM Identity Center
+
+Servicio de AWS que mantiene un directorio de identidades y asigna permisos
+por cuenta mediante permission sets. Es la recomendación de AWS para accesos
+humanos, sobre todo con varias cuentas o un IdP corporativo.
+
+### Permission set
+
+Plantilla de permisos de IAM Identity Center que se asigna a personas sobre
+cuentas. Su efecto son credenciales temporales por cuenta, no un usuario de
+IAM.
+
+### AWS Builder ID
+
+Identidad personal de AWS para herramientas para desarrolladores. No es una
+cuenta de AWS ni permite operar recursos de una cuenta.
+
+### IAM Roles Anywhere
+
+Mecanismo que permite a servidores fuera de AWS obtener credenciales
+temporales presentando certificados X.509 de una PKI propia. Sustituye las
+access keys en infraestructura on-premise.
+
+### Credenciales de consola
+
+Mecanismo local que canjea la sesión de consola de un usuario, con contraseña
+y MFA, por credenciales temporales para la CLI y los SDK. Evita crear access
+keys y exige un permiso explícito que autorice el canje.
+
+### Caché de sesión
+
+Almacenamiento local, fuera del proyecto, donde la herramienta guarda la
+autorización y las credenciales temporales. Caduca sola y su borrado equivale
+a cerrar sesión.
+
+### Perfil
+
+Nombre que agrupa región y fuente de credenciales en la configuración
+compartida. Un perfil moderno contiene referencias al mecanismo que produce
+las credenciales, no secretos.
+
+### Archivos de configuración compartida
+
+Archivos locales, compartidos por la CLI, los SDK y herramientas como el
+Toolkit de VS Code, donde se declaran perfiles y fuentes de credenciales.
+
+### Cadena de resolución de credenciales
+
+Orden fijo de fuentes que la CLI y los SDK consultan hasta encontrar
+credenciales: invocación, variables de entorno, configuración compartida y
+metadatos del entorno. Una fuente olvidada puede imponerse en silencio sobre
+el perfil que se cree estar usando.
+
+### Proceso de credenciales externo
+
+Perfil que delega la obtención de credenciales en un programa local. Es un
+adaptador para herramientas que no soportan un mecanismo de forma nativa, no
+un mecanismo de autenticación propio.
+
+### Rol de carga de trabajo
+
+Rol que un servicio de AWS asigna a un recurso, como una instancia, una tarea,
+un pod o una función, para entregar credenciales temporales al proceso sin
+distribuir secretos.
+
 ## Despliegue y operación cloud
 
 ### Backend

@@ -3,12 +3,12 @@
 **Capítulo:** 1  
 **Proyecto:** `agentcore-study`  
 **Entorno:** `learning`  
-**Propietario:** `<alias>`  
-**Región de estudio:** `<aws-region>`  
-**Cuenta AWS:** `<account-id>`  
-**Perfil AWS:** `<profile-name>`  
-**Fecha de inicio:** `<yyyy-mm-dd>`  
-**Fecha de revisión:** `<yyyy-mm-dd>`
+**Propietario:** `admin-bedrock`  
+**Región de estudio:** `us-east-1`  
+**Cuenta AWS:** `278655936591`  
+**Perfil AWS:** `profile-admin-bedrock`  
+**Fecha de inicio:** `2026-11-18`  
+**Fecha de revisión:** `2026-11-30`
 
 > Completa los campos entre `< >`. No incluyas access keys, tokens, secretos,
 > correos personales ni payloads sensibles.

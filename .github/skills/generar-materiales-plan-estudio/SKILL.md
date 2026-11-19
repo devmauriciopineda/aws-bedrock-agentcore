@@ -1,9 +1,9 @@
 ---
 name: generar-materiales-plan-estudio
 description: Elabora los documentos de estudio de un curso sobre cualquier tema a partir de su objeto y temario.
+disable-model-invocation: true
 argument-hint: Indica el objeto de estudio y pega o referencia el temario del curso.
 ---
-
 # Generar materiales de plan de estudio
 
 Elabora los materiales correspondientes al curso cuyo objeto y temario proporciona el usuario:
