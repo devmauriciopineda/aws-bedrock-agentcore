@@ -3,98 +3,105 @@
 1. Inicia sesión en la consola de AWS con la cuenta raíz.
 2. Abre **IAM > Dashboard > Security recommendations**.
 3. Activa MFA para la cuenta raíz.
-4. Cierra la sesión raíz.
-5. Inicia sesión con la identidad administrativa de estudio.
-6. Abre **IAM Identity Center**.
-7. Si la organización de estudio no tiene Identity Center, habilítalo en la
-   región indicada por AWS.
-8. Crea el usuario administrativo de estudio `<admin-alias>`.
-9. Activa MFA para `<admin-alias>`.
-10. Asigna a `<admin-alias>` únicamente el acceso administrativo necesario
-    para el laboratorio.
-11. Cierra sesión y vuelve a entrar con `<admin-alias>`.
-12. Selecciona una sola región compatible con Amazon Bedrock AgentCore y
+4. Abre **IAM > Users > Create user**.
+5. Introduce `<admin-alias>` como nombre del usuario administrativo de estudio.
+6. Activa el acceso a la consola de AWS para este usuario.
+7. Define una contraseña inicial y marca la opción para que el usuario la
+   cambie al iniciar sesión por primera vez.
+8. No actives la creación de access keys para este usuario.
+9. En permisos, crea el grupo `agentcore-study-admins`.
+10. Asocia temporalmente la política administrada `AdministratorAccess` al
+    grupo para poder crear los recursos del laboratorio.
+11. Crea el usuario y guarda únicamente el enlace de inicio de sesión, el
+    nombre de usuario y el nombre del grupo.
+12. Cierra la sesión de la cuenta raíz.
+13. Abre el enlace de inicio de sesión de IAM con `<admin-alias>`.
+14. Cambia la contraseña cuando AWS lo solicite.
+15. En **IAM > Users > <admin-alias> > Security credentials**, selecciona
+    **Assign MFA device** y configura MFA.
+16. Cierra sesión y vuelve a entrar con `<admin-alias>` usando MFA.
+17. Selecciona una sola región compatible con Amazon Bedrock AgentCore y
     anota su código como `<aws-region>`.
-13. En la consola, abre el selector de región y fija `<aws-region>`.
-14. Instala AWS CLI si no está instalada.
-15. Configura el acceso de la identidad administrativa mediante el mecanismo
+18. En la consola, abre el selector de región y fija `<aws-region>`.
+19. Instala AWS CLI si no está instalada.
+20. Configura el acceso de la identidad administrativa mediante el mecanismo
     recomendado por AWS; no crees access keys de la cuenta raíz.
-16. Configura el perfil local `<profile-name>`.
-17. Ejecuta:
+21. Configura el perfil local `<profile-name>`.
+22. Ejecuta:
 
     ```powershell
     aws sts get-caller-identity --profile <profile-name>
     ```
 
-18. Confirma que el `Account` corresponde a la cuenta de estudio.
-19. Ejecuta:
+23. Confirma que el `Account` corresponde a la cuenta de estudio.
+24. Ejecuta:
 
     ```powershell
     aws configure get region --profile <profile-name>
     ```
 
-20. Confirma que la región devuelta es `<aws-region>`.
-21. Abre **Billing and Cost Management > Budgets**.
-22. Selecciona **Create budget**.
-23. Elige un presupuesto de coste mensual.
-24. Asigna el nombre `agentcore-study-budget`.
-25. Define un importe mensual bajo y compatible con tu cuenta.
-26. Configura una alerta de coste cuando se alcance el porcentaje elegido.
-27. Añade un destinatario de alerta.
-28. Revisa la configuración y crea el presupuesto.
-29. Abre **Billing and Cost Management > Cost Explorer**.
-30. Activa Cost Explorer si la consola lo solicita.
-31. Guarda una captura del coste actual sin datos personales.
-32. Abre **Amazon Bedrock > Model access** en `<aws-region>`.
-33. Localiza `<model-id>`.
-34. Si la consola muestra una acción de habilitación o solicitud de acceso,
+25. Confirma que la región devuelta es `<aws-region>`.
+26. Abre **Billing and Cost Management > Budgets**.
+27. Selecciona **Create budget**.
+28. Elige un presupuesto de coste mensual.
+29. Asigna el nombre `agentcore-study-budget`.
+30. Define un importe mensual bajo y compatible con tu cuenta.
+31. Configura una alerta de coste cuando se alcance el porcentaje elegido.
+32. Añade un destinatario de alerta.
+33. Revisa la configuración y crea el presupuesto.
+34. Abre **Billing and Cost Management > Cost Explorer**.
+35. Activa Cost Explorer si la consola lo solicita.
+36. Guarda una captura del coste actual sin datos personales.
+37. Abre **Amazon Bedrock > Model access** en `<aws-region>`.
+38. Localiza `<model-id>`.
+39. Si la consola muestra una acción de habilitación o solicitud de acceso,
     ejecútala para `<model-id>`.
-35. Espera el estado habilitado o aprobado antes de continuar.
-36. Abre **Amazon Bedrock > Providers or Models** y confirma que el modelo
+40. Espera el estado habilitado o aprobado antes de continuar.
+41. Abre **Amazon Bedrock > Providers or Models** y confirma que el modelo
     está disponible en `<aws-region>`.
-37. Ejecuta una prueba mínima desde la consola con texto sintético.
-38. No pegues secretos, datos personales ni información de clientes en la
+42. Ejecuta una prueba mínima desde la consola con texto sintético.
+43. No pegues secretos, datos personales ni información de clientes en la
     prueba.
-39. Abre **IAM > Policies > Create policy**.
-40. Selecciona el servicio Amazon Bedrock.
-41. Selecciona únicamente las acciones de invocación requeridas por el
+44. Abre **IAM > Policies > Create policy**.
+45. Selecciona el servicio Amazon Bedrock.
+46. Selecciona únicamente las acciones de invocación requeridas por el
     laboratorio, como `InvokeModel` y, si se usará, streaming.
-42. Restringe el recurso al ARN del modelo `<model-id>` cuando la consola lo
+47. Restringe el recurso al ARN del modelo `<model-id>` cuando la consola lo
     permita.
-43. Nombra la política `agentcore-study-bedrock-invoke`.
-44. Añade las etiquetas `Project=agentcore-study`,
+48. Nombra la política `agentcore-study-bedrock-invoke`.
+49. Añade las etiquetas `Project=agentcore-study`,
     `Environment=learning` y `Owner=<alias>`.
-45. Revisa el resumen de permisos.
-46. Crea la política.
-47. Abre **IAM > Roles > Create role**.
-48. Selecciona el tipo de entidad o servicio que la pantalla de creación de
+50. Revisa el resumen de permisos.
+51. Crea la política.
+52. Abre **IAM > Roles > Create role**.
+53. Selecciona el tipo de entidad o servicio que la pantalla de creación de
     AgentCore Runtime indique para asumir el rol.
-49. No adivines el principal de confianza: copia únicamente el principal
+54. No adivines el principal de confianza: copia únicamente el principal
     mostrado por la documentación o el asistente vigente de AgentCore.
-50. Adjunta `agentcore-study-bedrock-invoke`.
-51. Nombra el rol `agentcore-study-execution`.
-52. Añade las etiquetas `Project=agentcore-study`,
+55. Adjunta `agentcore-study-bedrock-invoke`.
+56. Nombra el rol `agentcore-study-execution`.
+57. Añade las etiquetas `Project=agentcore-study`,
     `Environment=learning`, `Owner=<alias>` y
     `DeleteAfter=<yyyy-mm-dd>`.
-53. Revisa la política de confianza y los permisos.
-54. Crea el rol.
-55. Abre el rol recién creado y guarda solo su nombre y ARN en el inventario.
-56. No guardes credenciales ni tokens.
-57. Abre **Service Quotas** en `<aws-region>`.
-58. Consulta las cuotas de Amazon Bedrock y AgentCore relacionadas con el
+58. Revisa la política de confianza y los permisos.
+59. Crea el rol.
+60. Abre el rol recién creado y guarda solo su nombre y ARN en el inventario.
+61. No guardes credenciales ni tokens.
+62. Abre **Service Quotas** en `<aws-region>`.
+63. Consulta las cuotas de Amazon Bedrock y AgentCore relacionadas con el
     laboratorio.
-59. Registra las cuotas relevantes en el inventario.
-60. No solicites aumentos de cuota para este ejercicio.
-61. Abre **Amazon Bedrock AgentCore** en `<aws-region>`.
-62. Comprueba que Runtime, Gateway y Memory aparecen disponibles para la
+64. Registra las cuotas relevantes en el inventario.
+65. No solicites aumentos de cuota para este ejercicio.
+66. Abre **Amazon Bedrock AgentCore** en `<aws-region>`.
+67. Comprueba que Runtime, Gateway y Memory aparecen disponibles para la
     región.
-63. No crees todavía Runtime, Gateway ni Memory en este capítulo.
-64. Confirma que Browser y Code Interpreter permanecen deshabilitados.
-65. Crea localmente el archivo de inventario
+68. No crees todavía Runtime, Gateway ni Memory en este capítulo.
+69. Confirma que Browser y Code Interpreter permanecen deshabilitados.
+70. Crea localmente el archivo de inventario
     `course/entregas/capitulo-1/mapa-arquitectonico-agentcore.md`.
-66. Completa región, cuenta, perfil, presupuesto, modelo, política y rol.
-67. Añade las etiquetas y la fecha `DeleteAfter`.
-68. Ejecuta:
+71. Completa región, cuenta, perfil, presupuesto, modelo, política y rol.
+72. Añade las etiquetas y la fecha `DeleteAfter`.
+73. Ejecuta:
 
     ```powershell
     aws resourcegroupstaggingapi get-resources `
@@ -103,25 +110,25 @@
       --profile <profile-name>
     ```
 
-69. Revisa que no existan recursos de laboratorio inesperados.
-70. Abre **Billing > Budgets** y confirma que `agentcore-study-budget` está
+74. Revisa que no existan recursos de laboratorio inesperados.
+75. Abre **Billing > Budgets** y confirma que `agentcore-study-budget` está
     activo.
-71. Abre **Cost Explorer** y confirma el coste actual.
-72. Guarda la evidencia sin incluir datos sensibles.
-73. Si el rol de ejecución no se reutilizará en el capítulo 2, abre **IAM >
+76. Abre **Cost Explorer** y confirma el coste actual.
+77. Guarda la evidencia sin incluir datos sensibles.
+78. Si el rol de ejecución no se reutilizará en el capítulo 2, abre **IAM >
     Roles**, selecciona `agentcore-study-execution` y elimínalo.
-74. Antes de eliminarlo, elimina las políticas inline y desasocia las
+79. Antes de eliminarlo, elimina las políticas inline y desasocia las
     políticas administradas exclusivas del rol.
-75. Si la política `agentcore-study-bedrock-invoke` no se reutilizará, abre
+80. Si la política `agentcore-study-bedrock-invoke` no se reutilizará, abre
     **IAM > Policies**, selecciona la política y elimínala.
-76. Elimina `agentcore-study-budget` solo cuando ya no existan recursos del
+81. Elimina `agentcore-study-budget` solo cuando ya no existan recursos del
     laboratorio.
-77. Revoca sesiones temporales que ya no se utilicen.
-78. Mantén MFA de la cuenta raíz y de la identidad administrativa.
-79. Vuelve a ejecutar:
+82. Revoca sesiones temporales que ya no se utilicen.
+83. Mantén MFA de la cuenta raíz y de la identidad administrativa.
+84. Vuelve a ejecutar:
 
     ```powershell
     aws sts get-caller-identity --profile <profile-name>
     ```
 
-80. Confirma que la cuenta y región siguen siendo las esperadas.
+85. Confirma que la cuenta y región siguen siendo las esperadas.
